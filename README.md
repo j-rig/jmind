@@ -1,2 +1,3 @@
 # jmind
-josh's mind mapping tool
+
+josh's mind tools
