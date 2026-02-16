@@ -18,30 +18,30 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
-import java.util.HashMap;
+// import java.util.HashMap;
 
 public class Node {
 
     protected String uuid;
     protected Connection conn;
 
-    private static HashMap<String, String> cache;
+    // private static HashMap<String, String> cache;
 
     public Node(Connection conn, String uuid) {
         this.conn = conn;
         this.uuid = uuid;
-        if (cache == null) {
-            cache = new HashMap<String, String>();
-        }
+        // if (cache == null) {
+        // cache = new HashMap<String, String>();
+        // }
 
     };
 
     public Node(Connection conn) {
         this.conn = conn;
         this.uuid = UUID.randomUUID().toString();
-        if (cache == null) {
-            cache = new HashMap<String, String>();
-        }
+        // if (cache == null) {
+        // cache = new HashMap<String, String>();
+        // }
 
     };
 
@@ -60,21 +60,24 @@ public class Node {
     // Core Properties
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    protected String sqlSetProp = "INSERT OR REPLACE INTO node_props (type_column, uuid, key_column, value_column) VALUES (?, ?, ?, ?)";
-    protected String sqlGetProp = "SELECT value_column FROM node_props WHERE type_column = ? AND uuid = ? AND key_column = ?";
+    protected String sqlSetProp = "INSERT OR REPLACE INTO node_props (uuid, type_column, key_column, value_column) VALUES (?, ?, ?, ?)";
+    protected String sqlGetProp = "SELECT value_column FROM node_props WHERE uuid  = ? AND type_column = ? AND key_column = ?";
 
     protected String getProp(String t, String k, String d) throws java.sql.SQLException {
 
-        if (cache.containsKey(uuid + t + k))
-            return cache.get(uuid + t + k);
+        // if (cache.containsKey(uuid + t + k))
+        // return cache.get(uuid + t + k);
 
         PreparedStatement preparedStatement = conn.prepareStatement(sqlGetProp);
 
-        preparedStatement.setString(1, t);
-        preparedStatement.setString(2, this.uuid);
+        preparedStatement.setString(1, this.uuid);
+        preparedStatement.setString(2, t);
         preparedStatement.setString(3, k);
 
+        // System.out.println(preparedStatement.toString());
+
         ResultSet rs = preparedStatement.executeQuery();
+        // System.out.println(rs.toString());
 
         if (rs.next()) {
             return rs.getString("value_column");
@@ -105,19 +108,21 @@ public class Node {
 
         int result = 1;
 
-        if (cache.containsKey(uuid + t + k) && (cache.get(uuid + t + k) == v))
-            return result;
+        // if (cache.containsKey(uuid + t + k) && (cache.get(uuid + t + k) == v))
+        // return result;
 
         PreparedStatement preparedStatement = conn.prepareStatement(sqlSetProp);
 
-        preparedStatement.setString(1, t);
-        preparedStatement.setString(2, this.uuid);
+        preparedStatement.setString(1, this.uuid);
+        preparedStatement.setString(2, t);
         preparedStatement.setString(3, k);
         preparedStatement.setString(4, v);
 
+        // System.out.println(preparedStatement.toString());
+
         result = preparedStatement.executeUpdate();
-        if (result > 0)
-            cache.put(uuid + t + k, v);
+        // if (result > 0)
+        // cache.put(uuid + t + k, v);
         return result;
     };
 

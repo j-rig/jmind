@@ -28,11 +28,14 @@ public class MindNode extends Node {
         super(conn, uuid);
     }
 
-    private static final String CHILD_K = "nodeChildren";
+    private static final String CHILD_K = "mindmap.node.children";
+    private static final String CHILD_D = ";";
 
     private String[] getChildrenUuids() throws java.sql.SQLException {
-        String scuuids = getSysProp(CHILD_K, "");
-        String[] cuuids = scuuids.split(",");
+        String scuuids = getSysProp(CHILD_K, CHILD_D);
+        // if(scuuids.equals("")) return new String[0];
+        String[] cuuids = scuuids.split(CHILD_D);
+        // System.out.println(cuuids);
         return cuuids;
     }
 
@@ -43,25 +46,28 @@ public class MindNode extends Node {
             cuuids = getChildrenUuids();
 
             for (String cuid : cuuids) {
+                // if (cuid.length()>0)
                 result.add(new MindNode(this.conn, cuid));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        System.out.println(result);
         return result;
     }
 
     public void addChild(MindNode cn) throws java.sql.SQLException {
         Set<String> cuuids = new HashSet<>(Arrays.asList(getChildrenUuids()));
         cuuids.add(cn.getUuid());
-        setSysProp(CHILD_K, String.join(",", cuuids));
+        setSysProp(CHILD_K, String.join(CHILD_D, cuuids));
     }
 
     public void removeChild(Node cn) throws java.sql.SQLException {
         Set<String> cuuids = new HashSet<>(Arrays.asList(getChildrenUuids()));
         cuuids.remove(cn.getUuid());
-        setSysProp(CHILD_K, String.join(",", cuuids));
+        setSysProp(CHILD_K, String.join(CHILD_D, cuuids));
     }
 
     public void removeAllChild() throws java.sql.SQLException {
@@ -252,7 +258,7 @@ public class MindNode extends Node {
         }
     }
 
-    private final static String KEY_R = "mindmap.node.x";
+    private final static String KEY_R = "mindmap.node.root";
 
     public void setRoot() {
         try {

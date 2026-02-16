@@ -18,13 +18,14 @@ public class Nodes {
     private Connection conn;
 
     private static String createTableSQL = "CREATE TABLE IF NOT EXISTS node_props (" +
-            "uuid TEXT PRIMARY KEY, " +
+            "id INTEGER PRIMARY KEY, " +
+            "uuid TEXT NOT NULL, " +
             "type_column TEXT NOT NULL, " +
             "key_column TEXT NOT NULL, " +
             "value_column TEXT" +
             ")";
 
-    private String sqlGetAllUuids = "SELECT uuid FROM node_props";
+    private String sqlGetAllUuids = "SELECT distinct uuid FROM node_props";
 
     public static int createNodesTable(Connection conn) throws java.sql.SQLException {
         PreparedStatement stmt = conn.prepareStatement(createTableSQL);
@@ -50,7 +51,9 @@ public class Nodes {
         List<String> result = new ArrayList<>();
         PreparedStatement stmt = conn.prepareStatement(sqlGetAllUuids);
         ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
+        System.out.println(rs.toString());
+        while (rs.next()) {
+            // System.out.println(rs.getString("uuid"));
             result.add(rs.getString("uuid"));
         }
         return result;
