@@ -17,13 +17,21 @@ public class Nodes {
 
     private Connection conn;
 
+    // private static String createTableSQL = "CREATE TABLE IF NOT EXISTS node_props
+    // (" +
+    // "id INTEGER PRIMARY KEY, " +
+    // "uuid TEXT NOT NULL, " +
+    // "type_column TEXT NOT NULL, " +
+    // "key_column TEXT NOT NULL, " +
+    // "value_column TEXT" +
+    // ")";
+
     private static String createTableSQL = "CREATE TABLE IF NOT EXISTS node_props (" +
-            "id INTEGER PRIMARY KEY, " +
             "uuid TEXT NOT NULL, " +
             "type_column TEXT NOT NULL, " +
             "key_column TEXT NOT NULL, " +
-            "value_column TEXT" +
-            ")";
+            "value_column TEXT, " +
+            "PRIMARY KEY (uuid, type_column, key_column))";
 
     private String sqlGetAllUuids = "SELECT distinct uuid FROM node_props";
 
