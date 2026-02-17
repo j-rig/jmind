@@ -23,7 +23,7 @@ public class LogNode extends Node {
         super(conn);
         try {
             this.setSysProp("type", "log");
-            this.setSysPropInstant("created", Instant.now());
+            // this.setSysPropInstant("created", Instant.now());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -53,9 +53,10 @@ public class LogNode extends Node {
         return instant.atZone(ZoneOffset.UTC).toLocalDate();
     }
 
-    public Instant getModified() throws SQLException {
-        return getSysPropInstant("modified", getSysPropInstant("created", Instant.now()));
-    }
+    // public Instant getModified() throws SQLException {
+    // return getSysPropInstant("modified", getSysPropInstant("created",
+    // Instant.now()));
+    // }
 
     // Static methods for querying blog entries
     private static String sqlFindByDate = "SELECT uuid FROM node_props WHERE type_column = 's' AND key_column = 'entry_date' AND value_column = ?";

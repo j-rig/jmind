@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -19,6 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 // import java.util.HashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Node {
 
@@ -39,6 +42,12 @@ public class Node {
     public Node(Connection conn) {
         this.conn = conn;
         this.uuid = UUID.randomUUID().toString();
+        try {
+            this.setSysPropInstant("created", Instant.now());
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         // if (cache == null) {
         // cache = new HashMap<String, String>();
         // }
@@ -47,6 +56,54 @@ public class Node {
 
     public String getUuid() {
         return this.uuid;
+    }
+
+    public Instant getCreated() throws SQLException {
+        return getSysPropInstant("created", Instant.now());
+    }
+
+    public Instant getModified() throws SQLException {
+        return getSysPropInstant("modified", getSysPropInstant("created", Instant.now()));
+    }
+
+    // Get all user properties
+    private static String sqlGetUserProps = "SELECT key_column, value_column FROM node_props WHERE uuid = ? AND type_column = 'u'";
+
+    public Map<String, String> getUserProperties() throws SQLException {
+        Map<String, String> props = new HashMap<>();
+        PreparedStatement stmt = conn.prepareStatement(sqlGetUserProps);
+        stmt.setString(1, this.uuid);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            props.put(rs.getString("key_column"), rs.getString("value_column"));
+        }
+        return props;
+    }
+
+    // Delete a user property
+    private static String sqlDeleteUserProp = "DELETE FROM node_props WHERE uuid = ? AND type_column = 'u' AND key_column = ?";
+
+    public void deleteUserProp(String key) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(sqlDeleteUserProp);
+        stmt.setString(1, this.uuid);
+        stmt.setString(2, key);
+        stmt.executeUpdate();
+    }
+
+    // Get all system properties
+    private static String sqlGetSysProps = "SELECT key_column, value_column FROM node_props WHERE uuid = ? AND type_column = 's'";
+
+    public Map<String, String> getSystemProperties() throws SQLException {
+        Map<String, String> props = new HashMap<>();
+        PreparedStatement stmt = conn.prepareStatement(sqlGetSysProps);
+        stmt.setString(1, this.uuid);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            props.put(rs.getString("key_column"), rs.getString("value_column"));
+        }
+        return props;
     }
 
     private static String sqlRemoveNode = "DELETE FROM node_props WHERE uuid = ?";
