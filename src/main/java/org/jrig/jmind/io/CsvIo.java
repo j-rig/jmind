@@ -29,7 +29,7 @@ public class CsvIo {
 
     public static void saveNodes(File file, Connection conn) throws IOException, java.sql.SQLException {
 
-        String[] headers = { "type_column", "uuid", "key_column", "value_column" };
+        String[] headers = { "uuid", "type_column", "key_column", "value_column" };
 
         CSVFormat format = CSVFormat.EXCEL.builder()
                 .setHeader(headers)
@@ -41,9 +41,10 @@ public class CsvIo {
         PreparedStatement stmt = conn.prepareStatement(sqlSave);
         ResultSet rs = stmt.executeQuery();
 
-        if (rs.next()) {
-            printer.printRecord(rs.getString("type_column"),
+        while (rs.next()) {
+            printer.printRecord(
                     rs.getString("uuid"),
+                    rs.getString("type_column"),
                     rs.getString("key_column"),
                     rs.getString("value_column"));
         }

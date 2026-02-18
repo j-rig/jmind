@@ -9,9 +9,11 @@ package org.jrig.jmind;
 
 import org.jrig.jmind.model.LogNode;
 import org.jrig.jmind.model.Nodes;
+import org.jrig.jmind.ui.CsvIoDialog;
 import org.jrig.jmind.ui.MonthCalendarPanel;
 import org.jrig.jmind.ui.ScriptRunnerDialog;
 import org.jrig.jmind.ui.TextEditorPanel;
+import org.jrig.jmind.io.CsvIo;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -152,6 +154,13 @@ public class CaptiansLog extends JFrame {
         return panel;
     }
 
+    private void refreshAfterImport() {
+        if (isPanelsEnabled) {
+            loadLog(currentDate);
+            loadEntriesForCurrentMonth();
+        }
+    }
+
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
@@ -191,6 +200,11 @@ public class CaptiansLog extends JFrame {
         fileMenu.add(openFileItem);
         fileMenu.add(closeFileItem);
         fileMenu.addSeparator();
+
+        // Add CSV import/export using common utility
+        CsvIoDialog.addCsvMenuItems(fileMenu, this, () -> conn, this::refreshAfterImport);
+        fileMenu.addSeparator();
+
         fileMenu.add(saveItem);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);

@@ -9,6 +9,7 @@ package org.jrig.jmind;
 
 import org.jrig.jmind.model.Nodes;
 import org.jrig.jmind.model.TreeNode;
+import org.jrig.jmind.ui.CsvIoDialog;
 import org.jrig.jmind.ui.PropertyEditorPanel;
 import org.jrig.jmind.ui.ScriptRunnerDialog;
 import org.jrig.jmind.ui.TreePanel;
@@ -83,6 +84,12 @@ public class TreeMind extends JFrame {
         isPanelsEnabled = true;
     }
 
+    private void refreshAfterImport() {
+        if (isPanelsEnabled) {
+            treePanel.refreshTree();
+        }
+    }
+
     private void setComponentsEnabled(Container container, boolean enabled) {
         container.setEnabled(enabled);
         for (Component component : container.getComponents()) {
@@ -115,6 +122,13 @@ public class TreeMind extends JFrame {
         fileMenu.add(newFileItem);
         fileMenu.add(openFileItem);
         fileMenu.add(closeFileItem);
+
+        fileMenu.addSeparator();
+
+        // Add CSV import/export - use lambda to get current connection
+        CsvIoDialog.addCsvMenuItems(fileMenu, this, () -> conn, this::refreshAfterImport);
+        fileMenu.addSeparator();
+
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
 
